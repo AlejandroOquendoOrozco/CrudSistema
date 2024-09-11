@@ -1,0 +1,149 @@
+CREATE DATABASE CRUD_SISTEMA
+
+USE CRUD_SISTEMA
+
+
+CREATE TABLE.[dbo].EMPLEADO(
+
+ID_EMPLEADO INT PRIMARY KEY IDENTITY(1,1),
+NUMERO_DOCUMENTO VARCHAR(15),
+NOMBRE_COMPLETO VARCHAR (50),
+SUELDO INT
+
+
+
+)
+
+CREATE PROCEDURE SP_LISTA_EMPLEADOS
+AS
+BEGIN
+    BEGIN TRY
+        SELECT
+           E.ID_EMPLEADO AS IdEmpleado,
+           E.NUMERO_DOCUMENTO AS NumeroDocumento,
+           E.NOMBRE_COMPLETO AS NombreCompleto,
+           E.SUELDO AS Sueldo
+        FROM EMPLEADO E;
+    END TRY
+    BEGIN CATCH
+        -- Manejo de errores
+        PRINT 'Ocurrió un error al ejecutar el procedimiento.';
+        -- O también podrías devolver el error más detallado:
+        -- SELECT ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH
+END;
+
+EXEC SP_LISTA_EMPLEADOS
+
+
+CREATE PROCEDURE SP_OBTENER_EMPLEADO(
+
+@IdEmpleado INT
+)
+AS
+BEGIN
+    BEGIN TRY
+        SELECT
+           E.ID_EMPLEADO AS IdEmpleado,
+           E.NUMERO_DOCUMENTO AS NumeroDocumento,
+           E.NOMBRE_COMPLETO AS NombreCompleto,
+           E.SUELDO AS Sueldo
+        FROM EMPLEADO E
+		WHERE E.ID_EMPLEADO=@IdEmpleado
+    END TRY
+    BEGIN CATCH
+        -- Manejo de errores
+        PRINT 'Ocurrió un error al ejecutar el procedimiento.OBTENER EMPLEADO';
+        -- O también podrías devolver el error más detallado:
+        -- SELECT ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH
+END;
+
+CREATE PROCEDURE SP_CREAR_EMPLEADO(
+@NumeroDocumento VARCHAR(15),
+@NombreCompleto VARCHAR(50),
+@Sueldo INT,
+@msError VARCHAR(50) OUTPUT
+)
+AS
+BEGIN
+	BEGIN TRY
+		IF (EXISTS(SELECT ID_EMPLEADO FROM EMPLEADO WHERE NUMERO_DOCUMENTO=@NumeroDocumento))
+		BEGIN
+		     SET @msError='EL NUMERO DE DOCUMENTO YA SE ENCUENTRA REGISTRADO'
+			 RETURN
+		END
+		INSERT INTO EMPLEADO(NUMERO_DOCUMENTO,NOMBRE_COMPLETO,SUELDO) VALUES(@NumeroDocumento,@NombreCompleto,@Sueldo)
+		SET @msError=''
+	END TRY
+	BEGIN CATCH
+	    PRINT 'OCURRIO UN ERROR EN SP_CREAR_EMPLEADO'
+	END CATCH
+END
+
+CREATE PROCEDURE SP_ACTUALIZAR_EMPLEADO(
+@IdEmpleado INT,
+@NumeroDocumento VARCHAR(15),
+@NombreCompleto VARCHAR(50),
+@Sueldo INT,
+@msError VARCHAR(50) OUTPUT
+)
+AS
+BEGIN
+	BEGIN TRY
+		IF (EXISTS(SELECT ID_EMPLEADO FROM EMPLEADO WHERE NUMERO_DOCUMENTO=@NumeroDocumento AND ID_EMPLEADO!=@IdEmpleado))
+		BEGIN
+		     SET @msError='EL NUMERO DE DOCUMENTO YA SE ENCUENTRA REGISTRADO'
+			 RETURN
+		END
+		   UPDATE EMPLEADO SET NUMERO_DOCUMENTO=@NumeroDocumento,NOMBRE_COMPLETO=@NombreCompleto,SUELDO=@Sueldo WHERE ID_EMPLEADO=@IdEmpleado
+		SET @msError=''
+	END TRY
+	BEGIN CATCH
+	    PRINT 'OCURRIO UN ERROR EN SP_ACTUALIZAR_EMPLEADO'
+	END CATCH
+END
+CREATE PROCEDURE SP_ELIMINAR_EMPLEADO(
+@IdEmpleado INT
+
+)
+AS
+BEGIN
+	BEGIN TRY
+	   DELETE FROM EMPLEADO WHERE ID_EMPLEADO=@IdEmpleado
+	END TRY
+	BEGIN CATCH
+	    PRINT 'OCURRIO UN ERROR EN SP_ELIMINAR_EMPLEADO'
+	END CATCH
+END
+DECLARE @msError VARCHAR(50);
+
+EXEC SP_CREAR_EMPLEADO '1234567890', 'Juan Pérez', 3000, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '2345678901', 'Ana Gómez', 3500, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '3456789012', 'Luis Fernández', 4000, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '4567890123', 'María Rodríguez', 4500, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '5678901234', 'Carlos López', 5000, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '6789012345', 'Sofía Martínez', 3200, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '7890123456', 'Jorge Morales', 3700, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '8901234567', 'Laura Fernández', 3300, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '9012345678', 'Pedro Gómez', 3100, @msError OUTPUT;
+PRINT @msError;
+
+EXEC SP_CREAR_EMPLEADO '0123456789', 'Isabel Ruiz', 3400, @msError OUTPUT;
+PRINT @msError;
